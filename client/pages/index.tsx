@@ -1,5 +1,5 @@
 import React, { FC } from "react";
-import MainLayout from "../layouts/MainLayout";
+import MainLayout from "../layout/MainLayout";
 
 const Index: FC = () => {
   return (

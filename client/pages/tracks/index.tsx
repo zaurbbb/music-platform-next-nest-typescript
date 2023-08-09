@@ -7,7 +7,7 @@ import {
 import { useRouter } from "next/router";
 import React, { FC } from "react";
 import TrackList from "../../components/TrackList";
-import MainLayout from "../../layouts/MainLayout";
+import MainLayout from "../../layout/MainLayout";
 import { ITrack } from "../../types/track";
 
 const Index: FC = () => {

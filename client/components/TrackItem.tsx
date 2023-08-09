@@ -12,6 +12,8 @@ import { useRouter } from "next/router";
 import React, { FC } from "react";
 import { ITrack } from "../types/track";
 import styles from "../styles/TrackItem.module.scss";
+import PlayerIcon from "../UI/PlayerIcon";
+import TrackInfo from "../UI/TrackInfo";
 
 interface TrackItemProps {
   track: ITrack;
@@ -29,39 +31,37 @@ const TrackItem: FC<TrackItemProps> = ({
     artist,
     picture,
   } = track;
-  const displayIcon = active ? <Pause /> : <PlayArrow />;
+
   const displayTime = active && <div>02:33 / 03:22</div>;
 
   function handleNavigateTrack() {
     router.push(`/tracks/${track._id}`);
   }
+
+  function stopPropagation(e: React.MouseEvent) {
+    e.stopPropagation();
+  }
+
   return (
     <Card
       className={styles.track}
       onClick={handleNavigateTrack}
     >
-      <IconButton>
-        {displayIcon}
-      </IconButton>
+      <PlayerIcon active={active} />
       <img
         width={70}
         height={70}
         src={picture}
         alt={`Picture of ${name}`}
       />
-      <Grid
-        container
-        direction="column"
-        style={{
-          width: 200,
-          margin: "0 20px",
-        }}
+      <TrackInfo
+        name={name}
+        artist={artist}
+      />
+      <IconButton
+        onClick={stopPropagation}
+        style={{ margin: "auto" }}
       >
-        <div>{name}</div>
-        <div style={{fontSize: 12, color: 'gray'}}>{artist}</div>
-      </Grid>
-      {displayTime}
-      <IconButton style={{margin: "auto"}}>
         <Delete />
       </IconButton>
     </Card>

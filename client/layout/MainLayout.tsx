@@ -3,6 +3,7 @@ import React, {
   FC,
   ReactNode,
 } from "react";
+import Player from "../components/Player";
 import Sidebar from "../components/Sidebar";
 
 interface MainLayoutProps {
@@ -19,6 +20,7 @@ const MainLayout: FC<MainLayoutProps> = ({
       <Container style={{ margin: "40px 0" }}>
         {children}
       </Container>
+      <Player active={false} />
     </>
   );
 };
