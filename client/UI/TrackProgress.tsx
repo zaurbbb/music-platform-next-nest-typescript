@@ -1,9 +1,12 @@
-import React, { FC } from "react";
+import React, {
+  ChangeEvent,
+  FC,
+} from "react";
 
 interface TrackProgressProps {
   left: number;
   right: number;
-  onChange: (event) => void;
+  onChange: (event: ChangeEvent<HTMLInputElement>) => void;
 }
 
 const TrackProgress: FC<TrackProgressProps> = ({
@@ -13,12 +16,17 @@ const TrackProgress: FC<TrackProgressProps> = ({
   onChange,
 }) => {
   return (
-    <div style={{ display: "flex", padding: "0 20px" }}>
+    <div
+      style={{
+        display: "flex",
+        padding: "0 20px",
+      }}
+    >
       <input
         type="range"
-        min={left}
+        min={0}
         max={right}
-        value={left}
+        // value={left}
         onChange={onChange}
       />
       <p>{left} / {right}</p>

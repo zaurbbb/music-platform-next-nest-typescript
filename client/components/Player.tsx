@@ -1,53 +1,87 @@
 import { VolumeUp } from "@mui/icons-material";
-import React, { FC } from "react";
+import React, {
+  ChangeEvent,
+  FC,
+  useEffect,
+  useState,
+} from "react";
+import { API_URL } from "../api/index";
 import { useActions } from "../hooks/useActions";
-import { useAppDispatch } from "../hooks/useAppDispatch";
 import { useAppSelector } from "../hooks/useAppSelector";
-import {
-  setPause,
-  setPlay,
-} from "../store/player/slice";
 import styles from "../styles/Player.module.scss";
 import PlayerIcon from "../UI/PlayerIcon";
 import TrackInfo from "../UI/TrackInfo";
 import TrackProgress from "../UI/TrackProgress";
 
 const Player: FC = () => {
-  const track = {
-    _id: "64cfd938b12fe66317c82901",
-    name: "Summertime Sadness",
-    artist: "Lana Del Ray",
-    text: "Kiss me hard before you go,\nSummertime sadness",
-    listens: 0,
-    picture: "http://localhost:5000/image/c1724fcf-6b6d-4e68-a908-1e6be00ab49e.png",
-    audio: "http://localhost:5000/audio/20b9949b-f1da-481d-ac2b-7a126c1d6284.mp3",
-    comments: [],
-  };
+  const [audioElement, setAudioElement] = useState<HTMLAudioElement>();
+
   const {
+    pause,
+    volume,
     active,
     duration,
-    volume,
     currentTime,
-    pause,
   } = useAppSelector((state) => state.player);
-
-
-  // const { setPlay, setPause } = playerSlice.actions;
   const {
     setPause,
     setPlay,
+    setVolume,
+    setCurrentTime,
+    setDuration,
   } = useActions();
-  
+
+  useEffect(() => {
+    audioElement?.pause();
+    if (active) {
+      const audio = new Audio();
+      console.log(active.audio);
+      audio.src = API_URL + active.audio;
+      audio.volume = volume / 100;
+      audio.onloadedmetadata = () => {
+        setDuration(Math.ceil(audio.duration));
+      };
+      audio.ontimeupdate = () => {
+        setCurrentTime(Math.ceil(audio.currentTime));
+      };
+      audio.play();
+      setAudioElement(audio);
+    }
+
+    return () => {
+      audioElement?.pause();
+      setAudioElement(undefined);
+    };
+  }, [active]);
+
   function play() {
+    if (!audioElement) {
+      return;
+    }
+
     if (pause) {
       setPlay();
-      // setPlay();
-      //   // audio?.play();
-      //   // audio?.src = track.audio;
+      audioElement.play();
     } else {
       setPause();
-      //   // audio?.pause();
+      audioElement.pause();
     }
+  }
+
+  function handleVolume(event: ChangeEvent<HTMLInputElement>) {
+    if (!audioElement) return;
+
+    const value = Number(event.target.value);
+    audioElement.volume = value / 100;
+    setVolume(value);
+  }
+
+  function handleCurrentTime(event: ChangeEvent<HTMLInputElement>) {
+    if (!audioElement) return;
+
+    const value = Number(event.target.value);
+    audioElement.currentTime = value;
+    setCurrentTime(value);
   }
 
   return (
@@ -56,22 +90,21 @@ const Player: FC = () => {
         pause={pause}
         onClick={play}
       />
+      {/*<button onClick={play}>shalom mazafaka</button>*/}
       <TrackInfo
-        name="who"
-        artist="ami"
+        name={active?.name}
+        artist={active?.artist}
       />
       <TrackProgress
-        left={0}
-        right={100}
-        onChange={() => {
-        }}
+        left={currentTime}
+        right={duration}
+        onChange={handleCurrentTime}
       />
       <VolumeUp style={{ marginLeft: "auto" }} />
       <TrackProgress
-        left={0}
+        left={volume}
         right={100}
-        onChange={() => {
-        }}
+        onChange={handleVolume}
       />
     </div>
   );

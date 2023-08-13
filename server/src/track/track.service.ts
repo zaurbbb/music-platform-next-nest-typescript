@@ -74,6 +74,9 @@ export class TrackService {
     return track._id;
   }
 
+  async deleteAll(): Promise<void> {
+    await this.trackModel.deleteMany({});
+  }
   async addComment(dto: CreateCommentDto): Promise<Comment> {
     const track = await this.trackModel.findById(dto.trackId);
     const comment = await this.commentModel.create({ ...dto });

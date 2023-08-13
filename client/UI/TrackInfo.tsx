@@ -2,8 +2,8 @@ import { Grid } from "@mui/material";
 import React, { FC } from "react";
 
 interface TrackInfoProps {
-  name: string;
-  artist: string;
+  name: string | null;
+  artist: string | null;
 }
 
 const TrackInfo: FC<TrackInfoProps> = ({

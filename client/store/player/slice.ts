@@ -16,7 +16,7 @@ const slice = createSlice({
   name: "users",
   initialState: {
     active: null,
-    volume: 0,
+    volume: 50,
     duration: 0,
     currentTime: 0,
     pause: true,
@@ -37,7 +37,7 @@ const slice = createSlice({
     setDuration: (state, action: PayloadAction<number>) => {
       state.duration = action.payload;
     },
-    setActive: (state, action: PayloadAction<ITrack>) => {
+    setActive: (state, action: PayloadAction<ITrack | null>) => {
       state.active = action.payload;
       state.duration = 0;
       state.currentTime = 0;

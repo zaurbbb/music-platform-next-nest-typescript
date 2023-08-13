@@ -69,7 +69,7 @@ const Sidebar = () => {
           text,
           href,
           icon,
-        }, index) => (
+        }) => (
           <ListItem
             key={href}
             disablePadding

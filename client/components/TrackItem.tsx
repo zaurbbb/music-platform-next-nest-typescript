@@ -1,17 +1,16 @@
-import {
-  Delete,
-  Pause,
-  PlayArrow,
-} from "@mui/icons-material";
+import React, { FC } from "react";
+import { useRouter } from "next/router";
+
+import { Delete } from "@mui/icons-material";
 import {
   Card,
-  Grid,
   IconButton,
 } from "@mui/material";
-import { useRouter } from "next/router";
-import React, { FC } from "react";
-import { ITrack } from "../types/track";
+
+import { useActions } from "../hooks/useActions";
+import { useAppSelector } from "../hooks/useAppSelector";
 import styles from "../styles/TrackItem.module.scss";
+import { ITrack } from "../types/track";
 import PlayerIcon from "../UI/PlayerIcon";
 import TrackInfo from "../UI/TrackInfo";
 
@@ -23,7 +22,6 @@ interface TrackItemProps {
 const TrackItem: FC<TrackItemProps> = ({
   // component props
   track,
-  active = false,
 }) => {
   const router = useRouter();
   const {
@@ -31,15 +29,34 @@ const TrackItem: FC<TrackItemProps> = ({
     artist,
     picture,
   } = track;
-
-  const displayTime = active && <div>02:33 / 03:22</div>;
+  const {
+    active,
+    pause,
+  } = useAppSelector((state) => state.player);
+  const {
+    setPlay,
+    setPause,
+    setActive,
+  } = useActions();
 
   function handleNavigateTrack() {
     router.push(`/tracks/${track._id}`);
   }
 
-  function stopPropagation(e: React.MouseEvent) {
-    e.stopPropagation();
+  function stopPropagation(event: React.MouseEvent<HTMLButtonElement, MouseEvent>) {
+    event.stopPropagation();
+  }
+
+  function play() {
+    if (active) {
+      setActive(null);
+    }
+    setActive(track);
+    if (pause) {
+      setPlay();
+    } else {
+      setPause();
+    }
   }
 
   return (
@@ -48,9 +65,8 @@ const TrackItem: FC<TrackItemProps> = ({
       onClick={handleNavigateTrack}
     >
       <PlayerIcon
-        pause={true}
-        onClick={() => {
-        }}
+        pause={active?.name === name ? pause : true}
+        onClick={play}
       />
       <img
         width={70}

@@ -6,8 +6,8 @@ const Index: FC = () => {
     <>
       <MainLayout>
         <div className="center">
-          <h1>Welcome</h1>
-          <h3>Best tracks are here!</h3>
+          <h1>Добро пожаловать!</h1>
+          <h3>Здесь собраны лучшие треки!</h3>
         </div>
       </MainLayout>
 
@@ -16,7 +16,7 @@ const Index: FC = () => {
           .center {
             margin-top: 150px;
             display: flex;
-            flex-direction: column; 
+            flex-direction: column;
             align-items: center;
             justify-content: center;
           }

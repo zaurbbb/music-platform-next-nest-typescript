@@ -1,54 +1,54 @@
 import {
   Action,
-  AnyAction,
   combineReducers,
   configureStore,
   ThunkAction,
-} from '@reduxjs/toolkit';
-import {
-  createWrapper,
-  HYDRATE,
-} from 'next-redux-wrapper';
-import playerReducer, { playerActions } from './player/slice';
+} from "@reduxjs/toolkit";
+import { createWrapper } from "next-redux-wrapper";
+import playerReducer, { playerActions } from "./player/slice";
+import tracksReducer from "./tracks/slice";
 
-const combinedReducer = combineReducers({
+const rootReducer = combineReducers({
   player: playerReducer,
+  tracks: tracksReducer,
 });
 
-const reducer = (state: ReturnType<typeof combinedReducer>, action: AnyAction) => {
-  if (action.type === HYDRATE) {
-    return {
-      ...state, // use previous state
-      ...action.payload, // apply delta from hydration
-    };
+const makeConfiguredStore = () =>
+  configureStore({
+    reducer: rootReducer,
+    devTools: true,
+  });
+
+export const makeStore = () => {
+  const isServer = typeof window === "undefined";
+
+  if (isServer) {
+    return makeConfiguredStore();
   } else {
-    return combinedReducer(state, action);
+    // we need it only on client side
+    let store: any = configureStore({
+      reducer: rootReducer,
+      middleware: (getDefaultMiddleware) =>
+        getDefaultMiddleware({
+          serializableCheck: false,
+        }),
+      devTools: true,
+    });
+
+    return store;
   }
 };
 
-// @ts-ignore
-const makeStore = () => configureStore({ reducer });
-
-type Store = ReturnType<typeof makeStore>;
-
-type AppDispatch = Store['dispatch'];
-type RootState = ReturnType<Store['getState']>;
-type AppThunk<ReturnType = void> = ThunkAction<
+export type AppStore = ReturnType<typeof makeStore>;
+export type AppState = ReturnType<AppStore["getState"]>;
+export type AppThunk<ReturnType = void> = ThunkAction<
   ReturnType,
-  RootState,
+  AppState,
   unknown,
-  Action<string>
+  Action
 >;
 
-const wrapper = createWrapper(makeStore, { debug: true });
-export {
-  makeStore,
-  type AppDispatch,
-  type RootState,
-  type AppThunk,
-  wrapper,
-}
-
+export const wrapper = createWrapper<AppStore>(makeStore);
 export const ActionCreators = {
   ...playerActions,
 }
