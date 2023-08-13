@@ -6,21 +6,24 @@ import { IconButton } from "@mui/material";
 import React, { FC } from "react";
 
 interface PlayerIconProps {
-  active: boolean;
+  pause: boolean;
+  onClick: Function;
 }
 
 const PlayerIcon: FC<PlayerIconProps> = ({
   // component props
-  active,
+  pause,
+  onClick,
 }) => {
-  const displayIcon = active ? <Pause /> : <PlayArrow />;
+  const displayIcon = !pause ? <Pause /> : <PlayArrow />;
 
-  function stopPropagation(e: React.MouseEvent) {
+  function handleClick(e: React.MouseEvent<HTMLButtonElement, MouseEvent>) {
     e.stopPropagation();
+    onClick();
   }
 
   return (
-    <IconButton onClick={stopPropagation}>
+    <IconButton onClick={handleClick}>
       {displayIcon}
     </IconButton>
   );

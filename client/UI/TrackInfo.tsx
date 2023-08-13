@@ -18,6 +18,7 @@ const TrackInfo: FC<TrackInfoProps> = ({
       style={{
         width: 200,
         margin: "0 20px",
+        cursor: "pointer",
       }}
     >
       <div>{name}</div>

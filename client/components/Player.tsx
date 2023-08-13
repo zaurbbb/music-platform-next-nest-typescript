@@ -1,21 +1,61 @@
 import { VolumeUp } from "@mui/icons-material";
 import React, { FC } from "react";
-import PlayerIcon from "../UI/PlayerIcon";
+import { useActions } from "../hooks/useActions";
+import { useAppDispatch } from "../hooks/useAppDispatch";
+import { useAppSelector } from "../hooks/useAppSelector";
+import {
+  setPause,
+  setPlay,
+} from "../store/player/slice";
 import styles from "../styles/Player.module.scss";
+import PlayerIcon from "../UI/PlayerIcon";
 import TrackInfo from "../UI/TrackInfo";
 import TrackProgress from "../UI/TrackProgress";
 
-interface PlayerProps {
-  active: boolean;
-}
+const Player: FC = () => {
+  const track = {
+    _id: "64cfd938b12fe66317c82901",
+    name: "Summertime Sadness",
+    artist: "Lana Del Ray",
+    text: "Kiss me hard before you go,\nSummertime sadness",
+    listens: 0,
+    picture: "http://localhost:5000/image/c1724fcf-6b6d-4e68-a908-1e6be00ab49e.png",
+    audio: "http://localhost:5000/audio/20b9949b-f1da-481d-ac2b-7a126c1d6284.mp3",
+    comments: [],
+  };
+  const {
+    active,
+    duration,
+    volume,
+    currentTime,
+    pause,
+  } = useAppSelector((state) => state.player);
 
-const Player: FC<PlayerProps> = ({
-  // component props
-  active,
-}) => {
+
+  // const { setPlay, setPause } = playerSlice.actions;
+  const {
+    setPause,
+    setPlay,
+  } = useActions();
+  
+  function play() {
+    if (pause) {
+      setPlay();
+      // setPlay();
+      //   // audio?.play();
+      //   // audio?.src = track.audio;
+    } else {
+      setPause();
+      //   // audio?.pause();
+    }
+  }
+
   return (
     <div className={styles.player}>
-      <PlayerIcon active={active} />
+      <PlayerIcon
+        pause={pause}
+        onClick={play}
+      />
       <TrackInfo
         name="who"
         artist="ami"

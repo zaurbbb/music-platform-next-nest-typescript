@@ -17,7 +17,7 @@ const MainLayout: FC<MainLayoutProps> = ({
   return (
     <>
       <Sidebar />
-      <Container style={{ margin: "40px 0" }}>
+      <Container style={{ marginTop: 40  }}>
         {children}
       </Container>
       <Player active={false} />

@@ -47,7 +47,11 @@ const TrackItem: FC<TrackItemProps> = ({
       className={styles.track}
       onClick={handleNavigateTrack}
     >
-      <PlayerIcon active={active} />
+      <PlayerIcon
+        pause={true}
+        onClick={() => {
+        }}
+      />
       <img
         width={70}
         height={70}
