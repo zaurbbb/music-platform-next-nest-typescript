@@ -2,13 +2,14 @@ import React, {
   ChangeEvent,
   FC,
   ReactNode,
+  useEffect,
   useRef,
 } from "react";
 
 interface FileUploadProps {
   setFile: Function;
   accept: string;
-  children: ReactNode
+  children: ReactNode;
 }
 
 const FileUpload: FC<FileUploadProps> = ({
@@ -17,15 +18,24 @@ const FileUpload: FC<FileUploadProps> = ({
   accept,
   children,
 }) => {
-  const inputRef = useRef<HTMLInputElement>();
+  const inputRef = useRef<HTMLInputElement | null>(null);
+
+  useEffect(() => {
+    if (inputRef.current) {
+      inputRef.current.focus();
+    }
+  }, []);
 
   function handleInputRef() {
     inputRef?.current?.click();
   }
+
   function handleFileChange(event: ChangeEvent<HTMLInputElement>) {
-    console.log(event.target.files[0]);
-    setFile(event.target.files[0]);
+    if (event.target.files) {
+      setFile(event.target.files[0]);
+    }
   }
+
   return (
     <div onClick={handleInputRef}>
       <input

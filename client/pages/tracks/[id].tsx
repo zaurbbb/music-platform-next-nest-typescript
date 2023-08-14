@@ -3,31 +3,58 @@ import {
   TextField,
 } from "@mui/material";
 import Button from "@mui/material/Button";
+import { GetServerSideProps } from "next";
 import { useRouter } from "next/router";
-import React, { FC } from "react";
+import React, { useState } from "react";
+import { API } from "../../api/index";
+import { filePath } from "../../helpers/filePath";
+import { useAppDispatch } from "../../hooks/useAppDispatch";
+import { useInput } from "../../hooks/useInput";
 import MainLayout from "../../layout/MainLayout";
+import { addComment } from "../../store/tracks/thunks";
 import { ITrack } from "../../types/track";
 
-const TrackPage: FC = () => {
-  const track: ITrack =
-    {
-      _id: "64ca74fa70e707fa0c6abc48",
-      name: "Diet Mountain Dew",
-      artist: "Lana Del Ray",
-      text: "You're no good for me\nBaby, you're no good for me",
-      listens: 3,
-      picture: "http://localhost:5000/image/fa369549-576b-40c8-aaf3-5ad20e2df230.png",
-      audio: "http://localhost:5000/audio/b73e709b-ae02-4323-add9-1e7f786c02c6.mp3",
-      comments: [],
-    };
+interface TrackPageProps {
+  serverTrack: ITrack;
+}
+
+const TrackPage = ({
+  // next components
+  serverTrack,
+}: TrackPageProps) => {
+  const [track, setTrack] = useState<ITrack>(serverTrack);
+  const username = useInput("");
+  const text = useInput("");
+  const imagePath = filePath(track.picture);
   const router = useRouter();
+  const dispatch = useAppDispatch();
 
   function handleNavigateBack() {
     router.push("/tracks");
   }
 
+  async function handleAddComment() {
+    const comment = {
+      username: username.value,
+      text: text.value,
+      trackId: track._id,
+    };
+    dispatch(addComment(comment));
+    setTrack({
+      ...track,
+      comments: [
+        ...track.comments,
+        comment,
+      ],
+    });
+
+  }
+
   return (
-    <MainLayout>
+    <MainLayout
+      title={`Track ${track.name} by ${track.artist}`}
+      description={`Track ${track.name} by ${track.artist}`}
+    >
       <Button
         variant="outlined"
         style={{ fontSize: 20 }}
@@ -37,7 +64,7 @@ const TrackPage: FC = () => {
       </Button>
       <Grid style={{ margin: '20px 0' }}>
         <img
-          src={track.picture}
+          src={imagePath}
           alt="track"
           width={200}
           height={200}
@@ -50,22 +77,29 @@ const TrackPage: FC = () => {
       </Grid>
       <h1>Text lyrics</h1>
       <p>{track.text}</p>
-      <Grid container>
+      <Grid
+        container
+        style={{
+          gap: 20,
+        }}
+      >
         <TextField
           label="your name"
+          {...username}
           fullWidth
         />
         <TextField
           label="your comment on the track?"
+          {...text}
           fullWidth
           multiline
           rows={4}
         />
-        <Button>Send comment</Button>
+        <Button onClick={handleAddComment}>Send comment</Button>
       </Grid>
       <div>
         {track.comments.map((comment) => (
-          <div>
+          <div key={comment.text}>
             <div>Author: {comment.username}</div>
             <div>Comment: {comment.text}</div>
           </div>
@@ -75,6 +109,15 @@ const TrackPage: FC = () => {
   );
 };
 
+export const getServerSideProps: GetServerSideProps<{ serverTrack: ITrack }> = async ({ params }) => {
+  const response = await API.get(`/tracks/${params.id}`);
+  console.log(response.data.comments);
+  return {
+    props: {
+      serverTrack: response.data,
+    },
+  };
+};
+
 export default TrackPage;
-;
 

@@ -6,9 +6,12 @@ import {
   Card,
   IconButton,
 } from "@mui/material";
+import { filePath } from "../helpers/filePath";
 
 import { useActions } from "../hooks/useActions";
+import { useAppDispatch } from "../hooks/useAppDispatch";
 import { useAppSelector } from "../hooks/useAppSelector";
+import { removeTrack } from "../store/tracks/thunks";
 import styles from "../styles/TrackItem.module.scss";
 import { ITrack } from "../types/track";
 import PlayerIcon from "../UI/PlayerIcon";
@@ -28,6 +31,7 @@ const TrackItem: FC<TrackItemProps> = ({
     name,
     artist,
     picture,
+    _id,
   } = track;
   const {
     active,
@@ -38,13 +42,16 @@ const TrackItem: FC<TrackItemProps> = ({
     setPause,
     setActive,
   } = useActions();
+  const imagePath = filePath(picture);
+  const dispatch = useAppDispatch();
 
   function handleNavigateTrack() {
     router.push(`/tracks/${track._id}`);
   }
 
-  function stopPropagation(event: React.MouseEvent<HTMLButtonElement, MouseEvent>) {
+  function handleRemoveTrack(event: React.MouseEvent<HTMLButtonElement, MouseEvent>) {
     event.stopPropagation();
+    dispatch(removeTrack(_id));
   }
 
   function play() {
@@ -71,7 +78,7 @@ const TrackItem: FC<TrackItemProps> = ({
       <img
         width={70}
         height={70}
-        src={picture}
+        src={imagePath}
         alt={`Picture of ${name}`}
       />
       <TrackInfo
@@ -79,7 +86,7 @@ const TrackItem: FC<TrackItemProps> = ({
         artist={artist}
       />
       <IconButton
-        onClick={stopPropagation}
+        onClick={handleRemoveTrack}
         style={{ margin: "auto" }}
       >
         <Delete />

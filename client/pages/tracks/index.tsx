@@ -3,48 +3,57 @@ import {
   Button,
   Card,
   Grid,
+  TextField,
 } from "@mui/material";
-import {
-  GetServerSideProps,
-  NextPage,
-} from "next";
+import { GetServerSideProps } from "next";
 import { useRouter } from "next/router";
-import React, { FC } from "react";
+import React, {
+  useEffect,
+  useState,
+} from "react";
+import { useDispatch } from "react-redux";
 import TrackList from "../../components/TrackList";
-import { useAppDispatch } from "../../hooks/useAppDispatch";
+import { useActions } from "../../hooks/useActions";
 import { useAppSelector } from "../../hooks/useAppSelector";
 import MainLayout from "../../layout/MainLayout";
 import { wrapper } from "../../store/index";
 import { NextThunkDispatch } from "../../store/reducers";
-import { fetchTracks } from "../../store/tracks/thunks";
-// import {
-//   NextThunkDispatch,
-//   wrapper,
-// } from "../../store/index";
-// import { fetchTracks } from "../../store/tracks/thunks";
+import {
+  fetchTracks,
+  searchTracks,
+} from "../../store/tracks/thunks";
+import { ITrack } from "../../types/track";
 
-const Index: NextPage = () => {
+interface TracksPageProps {
+  serverTracks: ITrack[];
+}
+
+const Index = ({
+  // server props
+  serverTracks,
+}: TracksPageProps) => {
+  console.log("serverTracks", serverTracks);
+  const [query, setQuery] = useState<string>("");
+  const { tracks } = useAppSelector((state) => state.tracks);
+  const dispatch = useDispatch() as NextThunkDispatch;
+  const { setTracks } = useActions();
   const router = useRouter();
-  const dispatch = useAppDispatch();
-  const {
-    tracks,
-    error,
-  } = useAppSelector((state) => state.tracks);
+
+  useEffect(() => {
+    setTracks(serverTracks);
+  }, []);
 
   function handleNavigateCreate() {
     router.push("/tracks/create");
   }
 
-  if (error) {
-    return (
-      <MainLayout>
-        <h1>{error}</h1>
-      </MainLayout>
-    );
+  async function handleSearch(event: React.ChangeEvent<HTMLInputElement>) {
+    setQuery(event.target.value);
+    await dispatch(await searchTracks(event.target.value));
   }
-  console.log("tracks", tracks);
+
   return (
-    <MainLayout>
+    <MainLayout title="Music Platform Tracks">
       <Grid
         container
         justifyContent="center"
@@ -57,11 +66,13 @@ const Index: NextPage = () => {
             >
               <h1>Tracks list</h1>
               <Button onClick={handleNavigateCreate}>Upload</Button>
-              <button onClick={() => dispatch(fetchTracks())}>
-                Generate Kanye Quote
-              </button>
             </Grid>
           </Box>
+          <TextField
+            value={query}
+            fullWidth
+            onChange={handleSearch}
+          />
           <TrackList tracks={tracks} />
         </Card>
       </Grid>
@@ -70,15 +81,18 @@ const Index: NextPage = () => {
 };
 
 
-export default Index;
-
-export const getServerSideProps: GetServerSideProps = wrapper.getServerSideProps(
+export const getServerSideProps: GetServerSideProps<{ serverTracks: ITrack[] }> = wrapper.getServerSideProps(
   (store) =>
     async () => {
       const dispatch = store.dispatch;
-      await dispatch(fetchTracks());
+      await dispatch(await fetchTracks());
+      await store.dispatch(await fetchTracks());
+
       return {
-        props: {},
+        props: {
+          serverTracks: store.getState().tracks.tracks,
+        },
       };
-    }
+    },
 );
+export default Index;

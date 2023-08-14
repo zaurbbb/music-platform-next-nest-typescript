@@ -1,7 +1,12 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { HYDRATE } from "next-redux-wrapper";
 import { ITrack } from "../../types/track";
-import { fetchTracks } from "./thunks";
+import { getActionName } from "../helpers/getActionName";
+import {
+  createTrack,
+  fetchTracks,
+  removeTrack,
+  searchTracks,
+} from "./thunks";
 
 interface TrackState {
   tracks: ITrack[];
@@ -11,18 +16,42 @@ interface TrackState {
 // const increment: CaseReducer<State, PayloadAction<number>> = (state, action) => {
 //   state.value += action.payload;
 // }
+
+const redirectActions = {
+  tracks: [
+    "removeTrack",
+    "createTrack",
+  ],
+};
+const tracksAsyncActions = [
+  "fetchTracks",
+  "createTrack",
+]
 const slice = createSlice({
   name: "tracks",
   initialState: {
     tracks: [],
     error: "",
   } as TrackState,
-  reducers: {},
+  reducers: {
+    setTracks(state, action) {
+      state.tracks = action.payload;
+    }
+  },
   extraReducers: (builder) => {
     builder
-      .addCase(fetchTracks.fulfilled, (state, action: any) => {
-        state.tracks = action.payload;
-      })
+      .addMatcher(
+        (action) => tracksAsyncActions.includes(getActionName(action.type)),
+        (state, action) => {
+          state.tracks = action.payload;
+        }
+      )
+      .addMatcher(
+        (action) => redirectActions.tracks.includes(getActionName(action.type)),
+        (_, action) => {
+          action.payload.push("/tracks");
+        },
+      )
   },
   // extraReducers: {
   //   [HYDRATE]: (state, action) => {
@@ -35,4 +64,4 @@ const slice = createSlice({
 });
 
 export default slice.reducer;
-export const playerActions = slice.actions;
+export const tracksActions = slice.actions;

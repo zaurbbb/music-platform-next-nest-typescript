@@ -6,7 +6,7 @@ import {
 } from "@reduxjs/toolkit";
 import { createWrapper } from "next-redux-wrapper";
 import playerReducer, { playerActions } from "./player/slice";
-import tracksReducer from "./tracks/slice";
+import tracksReducer, { tracksActions } from "./tracks/slice";
 
 const rootReducer = combineReducers({
   player: playerReducer,
@@ -51,4 +51,5 @@ export type AppThunk<ReturnType = void> = ThunkAction<
 export const wrapper = createWrapper<AppStore>(makeStore);
 export const ActionCreators = {
   ...playerActions,
-}
+  ...tracksActions,
+};

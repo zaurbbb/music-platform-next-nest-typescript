@@ -6,6 +6,7 @@ import React, {
   useState,
 } from "react";
 import { API_URL } from "../api/index";
+import { filePath } from "../helpers/filePath";
 import { useActions } from "../hooks/useActions";
 import { useAppSelector } from "../hooks/useAppSelector";
 import styles from "../styles/Player.module.scss";
@@ -35,8 +36,7 @@ const Player: FC = () => {
     audioElement?.pause();
     if (active) {
       const audio = new Audio();
-      console.log(active.audio);
-      audio.src = API_URL + active.audio;
+      audio.src = filePath(active.audio);
       audio.volume = volume / 100;
       audio.onloadedmetadata = () => {
         setDuration(Math.ceil(audio.duration));

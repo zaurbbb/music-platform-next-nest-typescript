@@ -3,7 +3,7 @@ import MainLayout from "../../layout/MainLayout";
 
 const Index: FC = () => {
   return (
-    <MainLayout>
+    <MainLayout title="Music Platform Tracks">
       ALBUMS
     </MainLayout>
   );
