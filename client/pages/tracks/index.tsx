@@ -32,8 +32,9 @@ const Index = ({
   // server props
   serverTracks,
 }: TracksPageProps) => {
-  console.log("serverTracks", serverTracks);
   const [query, setQuery] = useState<string>("");
+  const [timer, setTimer] = useState<NodeJS.Timeout>();
+
   const { tracks } = useAppSelector((state) => state.tracks);
   const dispatch = useDispatch() as NextThunkDispatch;
   const { setTracks } = useActions();
@@ -49,7 +50,16 @@ const Index = ({
 
   async function handleSearch(event: React.ChangeEvent<HTMLInputElement>) {
     setQuery(event.target.value);
-    await dispatch(await searchTracks(event.target.value));
+
+    if (timer) {
+      clearTimeout(timer);
+    }
+
+    setTimer(
+      setTimeout(async () => {
+        await dispatch(await searchTracks(query));
+      }, 500),
+    );
   }
 
   return (
@@ -87,7 +97,7 @@ export const getServerSideProps: GetServerSideProps<{ serverTracks: ITrack[] }> 
       const dispatch = store.dispatch;
       await dispatch(await fetchTracks());
       await store.dispatch(await fetchTracks());
-
+      console.log("aaa");
       return {
         props: {
           serverTracks: store.getState().tracks.tracks,
